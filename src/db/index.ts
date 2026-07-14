@@ -59,6 +59,26 @@ export const initDB = async () => {
         );
     `);
 
+        // 4. Expenses table
+        await pool.query(`
+        CREATE TABLE IF NOT EXISTS expenses (
+        id BIGSERIAL PRIMARY KEY,
+
+        user_id BIGINT NOT NULL
+        REFERENCES users(id) ON DELETE CASCADE,
+
+        category_id BIGINT
+        REFERENCES categories(id) ON DELETE SET NULL,
+
+        product_name VARCHAR(150) NOT NULL,
+        amount NUMERIC(12, 2) NOT NULL CHECK (amount > 0),
+
+        expense_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+    `);
 
         console.log("Database connected and tables initialized successfully!");
     } catch (error) {
