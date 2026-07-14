@@ -27,7 +27,24 @@ export const initDB = async () => {
         );
     `);
 
-  
+        // 2. Profiles table
+        await pool.query(`
+        CREATE TABLE IF NOT EXISTS profiles (
+        id BIGSERIAL PRIMARY KEY,
+
+        user_id BIGINT UNIQUE NOT NULL
+        REFERENCES users(id) ON DELETE CASCADE,
+
+        phone VARCHAR(20),
+        avatar_url TEXT,
+
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+    `);
+
+ 
+
         console.log("Database connected and tables initialized successfully!");
     } catch (error) {
         console.error("Database initialization failed:", error);
