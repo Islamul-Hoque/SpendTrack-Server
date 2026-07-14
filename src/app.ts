@@ -1,6 +1,11 @@
 import express, { type Application, type Request, type Response } from "express";
+// import { userRoute } from "./modules/user/user.route";
+// import { profileRoute } from "./modules/profile/profile.route";
+// import { authRoute } from "./modules/auth/auth.route";
+// import logger from "./middleware/logger";
 import CookieParser from "cookie-parser";
 import cors from "cors";
+// import globalErrorHandler from "./middleware/globalErrorHandler";
 
 const app: Application = express();
 
@@ -12,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
     cors({
-        origin: ["http://localhost:3000"],
+        origin: ["http://localhost:3000", "https://spend-track-api.vercel.app"],
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
@@ -20,6 +25,9 @@ app.use(
     }),
 );
 
+
+// Custom logger middleware
+// app.use(logger);
 
 // Root route handler (GET)
 app.get("/", (req: Request, res: Response) => {
@@ -37,5 +45,11 @@ app.get("/", (req: Request, res: Response) => {
     })
 })
 
+// Application routing setup
+// app.use("/api/users", userRoute)
+// app.use("/api/profile", profileRoute);
+// app.use("/api/auth", authRoute);
 
+// Global Error Handling Middleware
+// app.use(globalErrorHandler);
 export default app;

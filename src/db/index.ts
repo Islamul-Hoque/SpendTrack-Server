@@ -1,26 +1,35 @@
 import { Pool } from "pg";
 import config from "../config";
 
-// PostgreSQL connection pool using Neon cloud database
+// PostgreSQL connection pool using Neon Cloud Database
 export const pool = new Pool({
     connectionString: config.connection_string,
 });
 
-// Setup PostgreSQL schema and create table if it doesn't exist
+// Initialize PostgreSQL database schema
 export const initDB = async () => {
     try {
+        // 1. Users table
+        await pool.query(`
+        CREATE TABLE IF NOT EXISTS users (
+        id BIGSERIAL PRIMARY KEY,
 
-        // create 'users' table
-        // await pool.query(`
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password_hash TEXT,
+        google_id VARCHAR(255) UNIQUE,
 
-        // `)
-        console.log("Database connected successfully!");
+        is_active BOOLEAN NOT NULL DEFAULT TRUE,
+        role VARCHAR(20) NOT NULL DEFAULT 'user',
 
-        // create 'profile' table
-        // await pool.query(`
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+    `);
 
-        // `)
+  
+        console.log("Database connected and tables initialized successfully!");
     } catch (error) {
-        console.log(error);
+        console.error("Database initialization failed:", error);
     }
-}
+};
