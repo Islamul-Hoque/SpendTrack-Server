@@ -1,20 +1,12 @@
-import express, { type Application, type Request, type Response } from "express";
+import app from "./app";
+import config from "./config";
+import { initDB } from "./db";
 
-const app: Application = express();
-const port = process.env.PORT || 3000;
-
-// Parse JSON payloads from incoming requests
-app.use(express.json());
-
-app.get("/", (req: Request, res: Response) => {
-    res.status(200).json({
-        status: "success",
-        message: "SpendTrack API is live and ready to handle requests",
-        version: "1.0.0",
-        author: "Islamul Hoque"
+const main = () => {
+    initDB();
+    app.listen(config.port, () => {
+        console.log(`Server is running at http://localhost:${config.port}`);
     });
-});
+};
 
-app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
-});
+main();

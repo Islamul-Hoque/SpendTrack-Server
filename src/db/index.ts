@@ -11,15 +11,15 @@ export const initDB = async () => {
     try {
 
         // create 'users' table
-        await pool.query(`
+        // await pool.query(`
 
-        `)
+        // `)
         console.log("Database connected successfully!");
 
         // create 'profile' table
-        await pool.query(`
+        // await pool.query(`
 
-        `)
+        // `)
     } catch (error) {
         console.log(error);
     }
