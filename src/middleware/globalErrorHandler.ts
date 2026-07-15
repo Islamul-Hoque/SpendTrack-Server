@@ -1,40 +1,56 @@
 import type { NextFunction, Request, Response } from "express";
-import config from "../config";
+import fs from "fs";
+import path from "path";
 
-const globalErrorHandler = (
-    err: any,
-    req: Request,
-    res: Response,
-    next: NextFunction,
-) => {
+const logsDirectory = path.join(process.cwd(), "logs");
+const logFilePath = path.join(logsDirectory, "logger.txt");
 
-    // Custom formatted timestamp
-    const formattedTime = new Date().toLocaleString("en-US", {
-        weekday: "long",
-        day: "2-digit", 
-        month: "short",   
-        year: "numeric",   
-        hour: "2-digit", 
-        minute: "2-digit",
-        hour12: true,
+const logger = (req: Request, res: Response, next: NextFunction) => {
+    const start = Date.now();
+
+    res.on("finish", () => {
+        const now = new Date();
+
+        const formattedTime = new Intl.DateTimeFormat("en-GB", {
+            weekday: "long",
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true,
+        }).format(now);
+
+        const duration = Date.now() - start;
+        const status = res.statusCode;
+
+        const logMessage =
+            `Method: ${req.method} | ` +
+            `URL: ${req.originalUrl} | ` +
+            `Status: ${status} | ` +
+            `Duration: ${duration}ms | ` +
+            `Time: ${formattedTime}\n`;
+
+        console.log(logMessage.trim());
+
+        // Create logs directory if it doesn't exist
+        fs.mkdir(logsDirectory, { recursive: true }, (mkdirError) => {
+            if (mkdirError) {
+                console.error("Failed to create logs directory:", mkdirError);
+                return;
+            }
+
+            // Append log message to log file
+            fs.appendFile(logFilePath, logMessage, "utf8", (error) => {
+                if (error) {
+                    console.error("Failed to write log:", error);
+                }
+            });
+        });
     });
 
-    // Default status code
-    const statusCode = err.statusCode || 500;
-
-    // Log error 
-    console.error(`[${formattedTime}] ${err.message}`);
-
-    res.status(statusCode).json({
-        success: false,
-        message: err.message || "Internal Server Error",
-
-        // Only show stack in development
-        ...(config.node_env === "development" && { stack: err.stack }),
-
-        // Optional: validation errors
-        errors: err.errors || undefined,
-    });
+    next();
 };
 
-export default globalErrorHandler;
+export default logger;
